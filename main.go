@@ -1,40 +1,43 @@
 package main
 
 import (
-	"fmt"
+	"Go_WebPhoto/views"
+	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-func handlerFunc(c *gin.Context) {
-	fmt.Fprint(c.Writer, "<h1>Welcome to my awesome site!</h1>")
-
-	c.Header("Content-Type", "text/html")
-	if c.Request.URL.Path == "/" {
-		fmt.Fprint(c.Writer, "<h1>Welcome to my awesome site!</h1>")
-	} else if c.Request.URL.Path == "/contact" {
-		fmt.Fprint(c.Writer, "To get in touch, please send an email "+
-			"to <a href=\"mailto:luigi.vanacore@outlook.com\">"+
-			"luigi.vanacore@outlook.com</a>.")
-	}
-}
-
-func hello(c *gin.Context) {
-	var name = "Luigi"
-	c.HTML(http.StatusOK, "hello.gohtml", gin.H{
-		"Name": name,
-	})
-}
+var (
+	homeView    *views.View
+	contactView *views.View
+	signupView  *views.View
+)
 
 func home(c *gin.Context) {
-	c.HTML(http.StatusOK, "home.gohtml", nil)
+	c.HTML(http.StatusOK, "home", nil)
+}
+
+func contact(c *gin.Context) {
+	c.HTML(http.StatusOK, "contact", nil)
+}
+
+func signup(c *gin.Context) {
+	c.HTML(http.StatusOK, "signup", nil)
 }
 
 func main() {
+	homeView = views.NewView("home", "static/templates/home.gohtml")
+	contactView = views.NewView("contact", "static/templates/contact.gohtml")
+	signupView = views.NewView("signup", "views/signup.gohtml")
+	r := multitemplate.NewRenderer()
+
+	r.Add("home", homeView.Template)
+	r.Add("contact", contactView.Template)
+	r.Add("signup", signupView.Template)
 	router := gin.Default()
-	router.LoadHTMLGlob("templates/*")
-	router.GET("/", handlerFunc)
-	router.GET("/hello", hello)
-	router.GET("/home", home)
+	router.HTMLRender = r
+	router.GET("/contact", contact)
+	router.GET("/signup", signup)
+	router.GET("/", home)
 	router.Run()
 }
