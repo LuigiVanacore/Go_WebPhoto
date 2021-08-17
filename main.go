@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Go_WebPhoto/controllers"
 	"Go_WebPhoto/views"
 	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
@@ -28,16 +29,17 @@ func signup(c *gin.Context) {
 func main() {
 	homeView = views.NewView("home", "static/templates/home.gohtml")
 	contactView = views.NewView("contact", "static/templates/contact.gohtml")
-	signupView = views.NewView("signup", "views/signup.gohtml")
+	usersC := controllers.NewUsers()
 	r := multitemplate.NewRenderer()
 
 	r.Add("home", homeView.Template)
 	r.Add("contact", contactView.Template)
-	r.Add("signup", signupView.Template)
+	r.Add("signup", usersC.NewView.Template)
 	router := gin.Default()
 	router.HTMLRender = r
 	router.GET("/contact", contact)
-	router.GET("/signup", signup)
+	router.GET("/signup", usersC.New)
+	router.POST("/signup", usersC.Create)
 	router.GET("/", home)
 	router.Run()
 }
